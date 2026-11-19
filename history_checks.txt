@@ -16,3 +16,6 @@
 06 Switch public API to functional pipeline
 ......................                                                   [100%]
 
+07 Isolate command line and filesystem effects
+......................                                                   [100%]
+

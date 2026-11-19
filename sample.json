@@ -1,0 +1,1 @@
+[{"op":"add","sku":"book","price":2500,"qty":2},{"op":"promo","code":"SAVE10"},{"op":"checkout"}]
