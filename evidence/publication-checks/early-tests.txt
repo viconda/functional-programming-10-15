@@ -1,0 +1,51 @@
+Аукцион: [(0, Auction(leader=None, closed=False)), (2, Auction(leader=Bid(bidder='Алия', amount=100), closed=False)), (5, Auction(leader=Bid(bidder='Нур', amount=120), closed=False)), (10, Auction(leader=Bid(bidder='Нур', amount=120), closed=True))] | 10
+Аукцион: [(0, Auction(leader=None, closed=False)), (2, Auction(leader=Bid(bidder='Алия', amount=100), closed=False)), (10, Auction(leader=Bid(bidder='Алия', amount=100), closed=True))] | 10
+Аукцион: [(0, Auction(leader=None, closed=False)), (10, Auction(leader=None, closed=True))] | 10
+Аукцион: [(0, Auction(leader=None, closed=False)), (10, Auction(leader=None, closed=True))] | 10
+Время: [(4, 'a'), (5, 'b'), (12, 'c'), (15, '|')]
+Время: [(6, 'b'), (12, 'c'), (12, '|')]
+Время: [(1, 'a'), (9, 'c'), (12, '|')]
+Время: [(3, 0), (6, 1), (9, 2), (9, '|')]
+Корзина | вход: [OnNext({'A': 10})@210, OnNext({'A': 15})@240, OnCompleted()@300] | выход: [OnNext(20.0)@220.0, OnNext(30.0)@240.0, OnNext(45.0)@260.0, OnCompleted()@300.0]
+Валюта | вход: [OnNext(10.0)@210, OnNext(5.0)@230, OnNext(10.0)@260, OnCompleted()@300] | выход: [OnNext(2350.0)@230.0, OnNext(4800.0)@260.0, OnCompleted()@300.0]
+Запросы | вход: [OnNext(q1)@210, OnNext(q2)@220, OnCompleted()@300] | выход: [OnNext(('q1', 'r1'))@235.0, OnNext(('q2', 'r2'))@255.0, OnCompleted()@300.0]
+Новости | вход: [OnNext(Дождь)@210, OnCompleted()@300] | выход: [OnNext(Дождь)@210.0, OnNext(Солнце)@230.0, OnCompleted()@300.0]
+Города | вход: [OnNext(('Алматы', 10))@210, OnNext(('Астана', 20))@220, OnNext(('Алматы', 5))@230, OnCompleted()@300] | выход: [OnNext(('Алматы', 10))@210.0, OnNext(('Астана', 20))@220.0, OnNext(('Алматы', 15))@230.0, OnCompleted()@300.0]
+CPU ошибка | вход: [OnNext(95.0)@210, OnError(отказ)@260] | выход: [OnNext(1.0)@220.0, OnError(отказ)@260.0]
+Начальное табло | датчики: [] | бронь: [] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnCompleted()@350.0]
+Датчик и освобождение | датчики: [OnNext(Event(kind='sensor', spot='A1', occupied=True))@230, OnNext(Event(kind='sensor', spot='A1', occupied=False))@260] | бронь: [] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnNext((('A2', 'A3'), ()))@240.0, OnNext((('A1', 'A2', 'A3'), ()))@270.0, OnCompleted()@350.0]
+Бронь и отмена | датчики: [] | бронь: [OnNext(Event(kind='reserve', spot='A2', occupied=False))@230, OnNext(Event(kind='cancel', spot='A2', occupied=False))@260] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnNext((('A1', 'A3'), ('A2',)))@240.0, OnNext((('A1', 'A2', 'A3'), ()))@270.0, OnCompleted()@350.0]
+Запрет брони занятого | датчики: [OnNext(Event(kind='sensor', spot='A1', occupied=True))@230] | бронь: [OnNext(Event(kind='reserve', spot='A1', occupied=False))@260] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnNext((('A2', 'A3'), ()))@240.0, OnCompleted()@350.0]
+Заезд по брони | датчики: [OnNext(Event(kind='sensor', spot='A2', occupied=True))@260] | бронь: [OnNext(Event(kind='reserve', spot='A2', occupied=False))@230] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnNext((('A1', 'A3'), ('A2',)))@240.0, OnNext((('A1', 'A3'), ()))@270.0, OnCompleted()@350.0]
+Фильтр неизвестных мест | датчики: [OnNext(Event(kind='sensor', spot='B4', occupied=True))@230] | бронь: [OnNext(Event(kind='reserve', spot='B4', occupied=False))@240] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnCompleted()@350.0]
+Пакет изменений | датчики: [OnNext(Event(kind='sensor', spot='A1', occupied=True))@230, OnNext(Event(kind='sensor', spot='A1', occupied=False))@234] | бронь: [] | табло: [OnNext((('A1', 'A2', 'A3'), ()))@210.0, OnCompleted()@350.0]
+Поиск | вход: [OnNext(ал)@210, OnNext(алм)@240, OnNext(аст)@310, OnNext(аст )@460, OnCompleted()@600] | выход: [OnNext(('астана', 'астрахань'))@450.0, OnCompleted()@600.0]
+Оплата | вход: [OnNext(a)@210, OnNext(b)@213, OnNext(c)@260, OnCompleted()@330] | выход: [OnNext(a)@210.0, OnNext(c)@260.0, OnCompleted()@330.0]
+Журнал | вход: [OnNext(a)@210, OnNext(b)@280, OnNext(c)@310, OnCompleted()@420] | выход: [OnNext(['a', 'b'])@300.0, OnNext(['c'])@400.0, OnNext([])@420.0, OnCompleted()@420.0]
+Датчик | вход: [OnNext(1.0)@210, OnNext(2.0)@245, OnNext(3.0)@270, OnNext(4.0)@301, OnCompleted()@340] | выход: [OnNext(2.0)@250.0, OnNext(3.0)@300.0, OnNext(4.0)@350.0, OnCompleted()@350.0]
+Резерв | вход: [OnNext(5.0)@220, OnNext(6.0)@300, OnCompleted()@360] | выход: [OnNext(5.0)@220.0, OnNext(-1.0)@270.0, OnCompleted()@270.0]
+test_auction_marbles (lab11.test_mini.MiniTests.test_auction_marbles)
+Проверить повышение, равенство, пустой аукцион и позднюю ставку. ... ok
+test_disposal (lab11.test_mini.MiniTests.test_disposal)
+Проверить остановку синхронного источника и отписку от Subject. ... ok
+test_errors (lab11.test_mini.MiniTests.test_errors)
+Проверить ошибки источника, функции и резервного обработчика. ... ok
+test_sources_and_operators (lab11.test_mini.MiniTests.test_sources_and_operators)
+Прогнать два независимых сценария для каждого оператора. ... ok
+test_virtual_operators (lab11.test_mini.MiniTests.test_virtual_operators)
+Сравнить абсолютное время значений и завершения. ... ok
+test_combinations (lab12.test_rx.RxTests.test_combinations)
+Проверить фактическую семантику пяти комбинаций. ... ok
+test_errors (lab12.test_rx.RxTests.test_errors)
+Проверить нормальный повтор, резерв, ошибку и ошибку как значение. ... ok
+test_loader_stop (lab12.test_rx.RxTests.test_loader_stop)
+Остановить загрузчик без незакрытых задач. ... ok
+test_parking (lab12.test_rx.RxTests.test_parking)
+Проверить семь сценариев парковки с точным временем. ... ok
+test_time (lab12.test_rx.RxTests.test_time)
+Проверить пять операторов времени. ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.622s
+
+OK
