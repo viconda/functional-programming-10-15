@@ -19,3 +19,6 @@
 07 Isolate command line and filesystem effects
 ......................                                                   [100%]
 
+08 Add property tests and equivalence evidence
+......................                                                   [100%]
+
