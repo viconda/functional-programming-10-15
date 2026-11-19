@@ -9,3 +9,4 @@ returns==0.30.0
 ruff==0.17.5
 mypy==2.4.1
 radon==6.0.1
+reactivex==4.1.0

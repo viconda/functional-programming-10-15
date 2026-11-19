@@ -1,8 +1,7 @@
 __pycache__/
+.venv/
 .pytest_cache/
-.hypothesis/
 .mypy_cache/
 .ruff_cache/
+.hypothesis/
 .coverage
-htmlcov/
-.venv/

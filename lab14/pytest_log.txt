@@ -1,0 +1,15 @@
+..................................................................       [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.14-final-0 _______________
+
+Name                        Stmts   Miss  Cover   Missing
+---------------------------------------------------------
+src\schedule\__init__.py        1      0   100%
+src\schedule\core.py           28      0   100%
+src\schedule\exercises.py      41      0   100%
+src\schedule\libraries.py      38      0   100%
+src\schedule\shell.py          22      0   100%
+---------------------------------------------------------
+TOTAL                         130      0   100%
+Coverage JSON written to file coverage.json
+66 passed in 4.59s

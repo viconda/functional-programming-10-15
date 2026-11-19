@@ -1,0 +1,259 @@
+src\schedule\__init__.py
+"""Лабораторная работа 14, вариант 3."""
+
+__all__: tuple[str, ...] = ()
+
+
+src\schedule\core.py
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, order=True)
+class Lesson:
+    """Занятие, полуоткрытый интервал минут в пределах дня."""
+
+    day: int
+    start: int
+    end: int
+    room: str
+    group: str
+    teacher: str
+
+
+def validate(lesson: Lesson) -> Lesson:
+    """Проверить поля занятия."""
+    if not 1 <= lesson.day <= 7 or not 0 <= lesson.start < lesson.end <= 1440:
+        raise ValueError("invalid interval")
+    if not all(x.strip() for x in (lesson.room, lesson.group, lesson.teacher)):
+        raise ValueError("empty resource")
+    return lesson
+
+
+def overlap(a: Lesson, b: Lesson) -> bool:
+    """Касание границ не считается пересечением."""
+    return a.day == b.day and a.start < b.end and b.start < a.end
+
+
+def conflict(a: Lesson, b: Lesson) -> bool:
+    """Совпавший ресурс занят только при пересечении времени."""
+    return overlap(a, b) and (a.room == b.room or a.group == b.group or a.teacher == b.teacher)
+
+
+def conflicts(schedule: tuple[Lesson, ...]) -> tuple[tuple[int, int], ...]:
+    """Вернуть индексы конфликтующих пар."""
+    return tuple(
+        (i, j)
+        for i, a in enumerate(schedule)
+        for j, b in enumerate(schedule)
+        if i < j and conflict(a, b)
+    )
+
+
+def add(schedule: tuple[Lesson, ...], lesson: Lesson) -> tuple[Lesson, ...]:
+    """Добавить занятие или вернуть ошибку, сохранив прежнюю версию."""
+    validate(lesson)
+    if any(conflict(old, lesson) for old in schedule):
+        raise ValueError("resource conflict")
+    return tuple(sorted((*schedule, lesson)))
+
+
+def remove(schedule: tuple[Lesson, ...], lesson: Lesson) -> tuple[Lesson, ...]:
+    """Удалить занятие, отсутствующее занятие не меняет результат."""
+    return tuple(x for x in schedule if x != lesson)
+
+
+src\schedule\exercises.py
+from itertools import groupby
+from statistics import median as reference_median
+
+
+def normalize(text: str) -> str:
+    """Идемпотентная нормализация пробелов и регистра."""
+    return " ".join(text.casefold().split())
+
+
+def sort_values(xs: tuple[int, ...]) -> tuple[int, ...]:
+    """Сортировка слиянием."""
+    if len(xs) < 2:
+        return xs
+    middle = len(xs) // 2
+    return merge(sort_values(xs[:middle]), sort_values(xs[middle:]))
+
+
+def merge(a: tuple[int, ...], b: tuple[int, ...]) -> tuple[int, ...]:
+    """Слить два отсортированных кортежа за линейное время."""
+    i, j = 0, 0
+    result: list[int] = []
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            result.append(a[i])
+            i += 1
+        else:
+            result.append(b[j])
+            j += 1
+    return tuple(result) + a[i:] + b[j:]
+
+
+def rle_encode(text: str) -> tuple[tuple[str, int], ...]:
+    """Однозначная кодировка поддерживает цифры и Unicode."""
+    return tuple((ch, sum(1 for _ in run)) for ch, run in groupby(text))
+
+
+def rle_decode(code: tuple[tuple[str, int], ...]) -> str:
+    """Декодировать проверенные серии."""
+    if any(len(ch) != 1 or n <= 0 for ch, n in code):
+        raise ValueError("invalid RLE")
+    return "".join(ch * n for ch, n in code)
+
+
+def balance(log: tuple[int, ...], initial: int = 0) -> int:
+    """Свернуть журнал целочисленных движений."""
+    return initial + sum(log)
+
+
+def median(xs: tuple[int, ...]) -> float:
+    """Медиана с усреднением центральной пары."""
+    if not xs:
+        raise ValueError("empty input")
+    return float(reference_median(xs))
+
+
+def chunks(xs: tuple[int, ...], size: int) -> tuple[tuple[int, ...], ...]:
+    """Разбить без потери хвоста."""
+    if size <= 0:
+        raise ValueError("size must be positive")
+    return tuple(xs[i : i + size] for i in range(0, len(xs), size))
+
+
+def enqueue(queue: tuple[int, ...], item: int) -> tuple[int, ...]:
+    """Создать новую версию учебной персистентной очереди."""
+    return (*queue, item)
+
+
+def dequeue(queue: tuple[int, ...]) -> tuple[int, tuple[int, ...]]:
+    """Удалить первый элемент, не меняя прежнюю очередь."""
+    if not queue:
+        raise ValueError("empty queue")
+    return queue[0], queue[1:]
+
+
+src\schedule\libraries.py
+from collections.abc import Mapping
+from typing import Any
+
+from pyrsistent import freeze
+from returns.pipeline import flow
+from returns.pointfree import bind
+from returns.result import Result, safe
+from toolz import pipe
+from toolz.curried import filter as tfilter
+from toolz.curried import groupby, sliding_window, valmap
+from toolz.curried import map as tmap
+
+
+def builtin_pipeline(values: tuple[int, ...]) -> dict[int, int]:
+    """Обычный конвейер: квадрат, фильтр и сумма по чётности."""
+    squared = tuple(x * x for x in values if x >= 0)
+    return {
+        k: sum(x for x in squared if x % 2 == k) for k in (0, 1) if any(x % 2 == k for x in squared)
+    }
+
+
+def toolz_pipeline(values: tuple[int, ...]) -> Any:
+    """Эквивалентная композиция curried map/filter/groupby/valmap."""
+    return pipe(
+        values,
+        tfilter(lambda x: x >= 0),
+        tmap(lambda x: x * x),
+        groupby(lambda x: x % 2),
+        valmap(sum),
+    )
+
+
+def windows(values: tuple[int, ...]) -> Any:
+    """Скользящие пары через curried sliding_window."""
+    return tuple(pipe(values, sliding_window(2)))
+
+
+def config(
+    defaults: Mapping[str, object], file: Mapping[str, object], env: Mapping[str, str]
+) -> Any:
+    """Приоритет env > файл > defaults, результат рекурсивно заморожен."""
+    overrides = {
+        k[4:].lower(): int(v) if v.isdecimal() else v
+        for k, v in env.items()
+        if k.startswith("APP_")
+    }
+    return freeze({**defaults, **file, **overrides})
+
+
+@safe
+def parse_positive(text: str) -> int:
+    """Обернуть исключения в returns.Result."""
+    value = int(text)
+    if value <= 0:
+        raise ValueError("positive required")
+    return value
+
+
+def reciprocal(value: int) -> Result[float, Exception]:
+    """Успешный результат второго шага."""
+    return safe(lambda: 1 / value)()
+
+
+def result_pipeline(text: str) -> Result[float, Exception]:
+    """Соединить шаги flow и bind, сохранив первую ошибку."""
+    return flow(text, parse_positive, bind(reciprocal))
+
+
+def own_result(text: str) -> tuple[float | None, str | None]:
+    """Простой аналог Result с явной проверкой ошибки."""
+    try:
+        value = int(text)
+        if value <= 0:
+            raise ValueError("positive required")
+        return 1 / value, None
+    except ValueError as exc:
+        return None, str(exc)
+
+
+src\schedule\shell.py
+import argparse
+import json
+from pathlib import Path
+
+from .core import Lesson, add
+
+
+def parse(text: str) -> tuple[Lesson, ...]:
+    """Собрать проверенное расписание из JSON."""
+    schedule: tuple[Lesson, ...] = ()
+    for row in json.loads(text):
+        schedule = add(schedule, Lesson(**row))
+    return schedule
+
+
+def render(schedule: tuple[Lesson, ...]) -> str:
+    """Текстовое представление расписания."""
+    return "\n".join(
+        f"День {x.day} {x.start:04d}-{x.end:04d} {x.room} {x.group} {x.teacher}" for x in schedule
+    )
+
+
+def write_report(path: Path, schedule: tuple[Lesson, ...]) -> None:
+    """Записать UTF-8 отчёт."""
+    path.write_text(render(schedule), encoding="utf-8")
+
+
+def main(argv: list[str] | None = None) -> None:
+    """CLI с входным JSON и необязательным файлом отчёта."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "input", type=Path, nargs="?", default=Path(__file__).parents[2] / "sample.json"
+    )
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args(argv)
+    result = parse(args.input.read_text(encoding="utf-8"))
+    print(render(result))
+    if args.output:
+        write_report(args.output, result)

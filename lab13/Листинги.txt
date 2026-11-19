@@ -1,0 +1,338 @@
+src\analytics\__init__.py
+"""Лабораторная работа 13, вариант 3."""
+
+__all__: tuple[str, ...] = ()
+
+
+src\analytics\async_io.py
+import asyncio
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Source:
+    """Детерминированный сценарий ответа имитированного сервиса."""
+
+    number: int
+    delay: float
+    fails: bool
+
+
+def sources(seed: int = 3) -> tuple[Source, ...]:
+    """Двадцать источников, воспроизводимые задержки и 20 процентов ошибок."""
+    import random
+
+    rnd = random.Random(seed)
+    return tuple(
+        Source(i, (0.2 if i % 7 == 0 else rnd.uniform(0.01, 0.04)), rnd.random() < 0.2)
+        for i in range(20)
+    )
+
+
+async def fetch(source: Source) -> int:
+    """Имитировать ввод-вывод и ошибку источника."""
+    await asyncio.sleep(source.delay)
+    if source.fails:
+        raise OSError(f"source {source.number} failed")
+    return source.number * 10
+
+
+async def load(
+    items: tuple[Source, ...], concurrent: bool, timeout: float = 0.1
+) -> list[int | BaseException]:
+    """Ограничить конкурентность пятью и применить тайм-аут к запросу."""
+    semaphore = asyncio.Semaphore(5)
+
+    async def guarded(source: Source) -> int:
+        async with semaphore:
+            return await asyncio.wait_for(fetch(source), timeout)
+
+    if concurrent:
+        return list(await asyncio.gather(*(guarded(s) for s in items), return_exceptions=True))
+    result: list[int | BaseException] = []
+    for item in items:
+        try:
+            result.append(await guarded(item))
+        except Exception as exc:
+            result.append(exc)
+    return result
+
+
+def aggregate(results: list[int | BaseException]) -> tuple[int, int, int]:
+    """Чистая агрегация успешных значений и числа ошибок."""
+    values = tuple(x for x in results if isinstance(x, int))
+    return sum(values), len(values), len(results) - len(values)
+
+
+src\analytics\core.py
+from .model import Grade, Summary
+
+
+def summarize(rows: tuple[Grade, ...]) -> tuple[Summary, ...]:
+    """Рассчитать средние, не меняя вход."""
+
+    def one(group: str) -> Summary:
+        scores = tuple(r.score for r in rows if r.group == group)
+        avg = sum(scores) / len(scores)
+        return Summary(group, avg, "ОК" if avg >= 70 else "РИСК")
+
+    return tuple(map(one, sorted({r.group for r in rows})))
+
+
+def is_prime(n: int) -> bool:
+    """Проверить простоту целого числа."""
+    if n < 2:
+        return False
+    if n % 2 == 0:
+        return n == 2
+    return all(n % d for d in range(3, int(n**0.5) + 1, 2))
+
+
+def count_primes(values: tuple[int, ...]) -> int:
+    """Свернуть пакет чисел в количество простых."""
+    return sum(map(is_prime, values))
+
+
+def square_batch(values: tuple[int, ...]) -> tuple[int, ...]:
+    """Независимый шаг для универсального конвейера."""
+    return tuple(x * x for x in values)
+
+
+src\analytics\frames.py
+from concurrent.futures import ProcessPoolExecutor
+
+import pandas as pd
+
+
+def clean(df: pd.DataFrame) -> pd.DataFrame:
+    """Создать очищенную таблицу."""
+    return df.dropna(subset=["branch", "qty", "price"]).assign(
+        branch=lambda d: d.branch.str.strip().str.lower()
+    )
+
+
+def add_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Вычислить выручку без изменения входа."""
+    return df.assign(revenue=lambda d: d.qty * d.price)
+
+
+def filter_valid(df: pd.DataFrame) -> pd.DataFrame:
+    """Отобрать положительные количества и неотрицательные цены."""
+    return df.query("qty > 0 and price >= 0").copy()
+
+
+def aggregate(df: pd.DataFrame) -> pd.DataFrame:
+    """Суммы и число строк по филиалу."""
+    return df.groupby("branch", as_index=False).agg(
+        revenue=("revenue", "sum"), orders=("qty", "size")
+    )
+
+
+def pipeline(df: pd.DataFrame) -> pd.DataFrame:
+    """Четыре независимых шага через pipe."""
+    return df.pipe(clean).pipe(add_features).pipe(filter_valid).pipe(aggregate)
+
+
+def parallel(df: pd.DataFrame, workers: int = 4) -> pd.DataFrame:
+    """MapReduce с повторной агрегацией частичных сумм."""
+    size = max(1, (len(df) + workers - 1) // workers)
+    parts = [df.iloc[i : i + size].copy() for i in range(0, len(df), size)]
+    if not parts:
+        return pipeline(df)
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        partials = list(pool.map(pipeline, parts))
+    return pd.concat(partials).groupby("branch", as_index=False)[["revenue", "orders"]].sum()
+
+
+src\analytics\images.py
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+
+Matrix = tuple[tuple[int, ...], ...]
+
+
+def validate(image: Matrix) -> None:
+    """Проверить прямоугольную матрицу значений 0..255."""
+    if not image or not image[0] or any(len(row) != len(image[0]) for row in image):
+        raise ValueError("image must be nonempty and rectangular")
+    if any(not 0 <= x <= 255 for row in image for x in row):
+        raise ValueError("pixel must be in 0..255")
+
+
+def sample(image: Matrix, y: int, x: int) -> int:
+    """Продлить границу ближайшим пикселем."""
+    return image[min(max(y, 0), len(image) - 1)][min(max(x, 0), len(image[0]) - 1)]
+
+
+def filter_rows(bounds: tuple[int, int], image: Matrix, mode: str) -> Matrix:
+    """Рассчитать полоску с доступом к ореолу исходной матрицы."""
+
+    def pixel(y: int, x: int) -> int:
+        if mode == "blur":
+            return sum(sample(image, y + dy, x + dx) for dy in (-1, 0, 1) for dx in (-1, 0, 1)) // 9
+        laplace = 4 * sample(image, y, x) - sum(
+            sample(image, y + dy, x + dx) for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1))
+        )
+        return min(255, abs(laplace))
+
+    return tuple(tuple(pixel(y, x) for x in range(len(image[0]))) for y in range(*bounds))
+
+
+def transform(image: Matrix, mode: str = "blur", workers: int = 1) -> Matrix:
+    """Фильтр размытия или Лапласа, последовательно или полосками."""
+    validate(image)
+    if mode not in ("blur", "edges") or workers < 1:
+        raise ValueError("invalid mode or workers")
+    if workers == 1:
+        return filter_rows((0, len(image)), image, mode)
+    size = max(1, (len(image) + workers - 1) // workers)
+    bounds = tuple((i, min(i + size, len(image))) for i in range(0, len(image), size))
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        return tuple(
+            row
+            for part in pool.map(partial(filter_rows, image=image, mode=mode), bounds)
+            for row in part
+        )
+
+
+src\analytics\model.py
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Grade:
+    """Неизменяемая оценка студента."""
+
+    group: str
+    score: int
+
+
+@dataclass(frozen=True)
+class Summary:
+    """Средний балл группы."""
+
+    group: str
+    average: float
+    status: str
+
+
+src\analytics\parallel.py
+from collections.abc import Callable
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+from typing import TypeVar
+
+T = TypeVar("T")
+
+
+def chunks(xs: tuple[T, ...], size: int) -> tuple[tuple[T, ...], ...]:
+    """Сохранить все элементы при разбиении."""
+    if size <= 0:
+        raise ValueError("size must be positive")
+    return tuple(xs[i : i + size] for i in range(0, len(xs), size))
+
+
+def apply_steps(
+    data: tuple[int, ...], steps: tuple[Callable[[tuple[int, ...]], tuple[int, ...]], ...]
+) -> tuple[int, ...]:
+    """Применить весь конвейер к одному фрагменту."""
+    for step in steps:
+        data = step(data)
+    return data
+
+
+def parallel_pipeline(
+    steps: tuple[Callable[[tuple[int, ...]], tuple[int, ...]], ...],
+    data: tuple[int, ...],
+    workers: int,
+) -> tuple[int, ...]:
+    """Конвейер для независимых элементов с сохранением порядка."""
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        parts = chunks(data, max(1, (len(data) + workers - 1) // workers))
+        return tuple(x for part in pool.map(partial(apply_steps, steps=steps), parts) for x in part)
+
+
+src\analytics\parsing.py
+import csv
+
+from .model import Grade
+
+
+def parse_grades(text: str) -> tuple[Grade, ...]:
+    """Разобрать CSV без обращения к файлам."""
+    return tuple(Grade(r["group"], int(r["score"])) for r in csv.DictReader(text.splitlines()))
+
+
+src\analytics\pipeline.py
+import csv
+from collections.abc import Callable
+from datetime import date
+from io import StringIO
+
+from .core import summarize
+from .model import Summary
+from .parsing import parse_grades
+
+Formatter = Callable[[tuple[Summary, ...], date], str]
+
+
+def formatter(name: str, registry: dict[str, Formatter]) -> Callable[[Formatter], Formatter]:
+    """Зарегистрировать форматтер в переданном реестре."""
+
+    def register(fn: Formatter) -> Formatter:
+        registry[name] = fn
+        return fn
+
+    return register
+
+
+def make_formatters() -> dict[str, Formatter]:
+    """Создать отдельный реестр без изменяемого глобального состояния."""
+    registry: dict[str, Formatter] = {}
+
+    @formatter("text", registry)
+    def text(rows: tuple[Summary, ...], today: date) -> str:
+        return "".join(f"{today} {r.group}: средний {r.average:.1f} [{r.status}]\n" for r in rows)
+
+    @formatter("md", registry)
+    def markdown(rows: tuple[Summary, ...], today: date) -> str:
+        return f"Отчёт от {today}\n\n| Группа | Средний | Статус |\n|---|---|---|\n" + "".join(
+            f"| {r.group} | {r.average:.1f} | {r.status} |\n" for r in rows
+        )
+
+    @formatter("csv", registry)
+    def csv_text(rows: tuple[Summary, ...], today: date) -> str:
+        out = StringIO(newline="")
+        writer = csv.writer(out, lineterminator="\n")
+        writer.writerow(("date", "group", "average", "status"))
+        writer.writerows((str(today), r.group, f"{r.average:.1f}", r.status) for r in rows)
+        return out.getvalue()
+
+    return registry
+
+
+def build(text: str, today: date, fmt: str = "text") -> tuple[str, str]:
+    """Соединить разбор, ядро и форматирование."""
+    rows = summarize(parse_grades(text))
+    return make_formatters()[fmt](rows, today), f"Отчёт от {today}: групп {len(rows)}\n"
+
+
+src\analytics\shell.py
+from collections.abc import Callable
+from datetime import date
+
+from .pipeline import build
+
+
+def run(
+    load: Callable[[], str],
+    now: Callable[[], date],
+    save: Callable[[str], None],
+    emit: Callable[[str], None] = print,
+    fmt: str = "text",
+) -> str:
+    """Внедрить эффекты чтения, даты, записи и вывода."""
+    rendered, header = build(load(), now(), fmt)
+    emit(rendered.rstrip("\n"))
+    save(header if fmt == "text" else rendered)
+    return rendered

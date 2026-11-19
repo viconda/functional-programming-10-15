@@ -1,0 +1,20 @@
+...........................                                              [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.14-final-0 _______________
+
+Name                        Stmts   Miss  Cover   Missing
+---------------------------------------------------------
+src\analytics\__init__.py       1      0   100%
+src\analytics\async_io.py      33      0   100%
+src\analytics\core.py          17      0   100%
+src\analytics\frames.py        20      1    95%   40
+src\analytics\images.py        27      0   100%
+src\analytics\model.py         10      0   100%
+src\analytics\parallel.py      17      0   100%
+src\analytics\parsing.py        4      0   100%
+src\analytics\pipeline.py      32      0   100%
+src\analytics\shell.py          8      0   100%
+---------------------------------------------------------
+TOTAL                         169      1    99%
+Coverage JSON written to file coverage.json
+27 passed in 1.74s

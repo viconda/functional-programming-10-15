@@ -1,0 +1,593 @@
+{
+  "machine": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "cpu_count": 12,
+    "processor": "AMD64 Family 25 Model 116 Stepping 1, AuthenticAMD",
+    "repeats": 3,
+    "statistic": "median",
+    "process_startup_included": true
+  },
+  "lab13": {
+    "cpu_rows": 3500,
+    "prime_count": 338,
+    "sequential": 0.32132330001331866,
+    "cpu": [
+      {
+        "kind": "thread",
+        "workers": 1,
+        "seconds": 0.3296420999977272,
+        "speedup": 0.9747641457675889
+      },
+      {
+        "kind": "thread",
+        "workers": 2,
+        "seconds": 0.3188920000102371,
+        "speedup": 1.0076242113411547
+      },
+      {
+        "kind": "thread",
+        "workers": 4,
+        "seconds": 0.30910069998935796,
+        "speedup": 1.0395424533958724
+      },
+      {
+        "kind": "thread",
+        "workers": 8,
+        "seconds": 0.3150522999931127,
+        "speedup": 1.0199046317717504
+      },
+      {
+        "kind": "process",
+        "workers": 1,
+        "seconds": 0.44978399999672547,
+        "speedup": 0.7143946872624592
+      },
+      {
+        "kind": "process",
+        "workers": 2,
+        "seconds": 0.4476405000023078,
+        "speedup": 0.7178155238671704
+      },
+      {
+        "kind": "process",
+        "workers": 4,
+        "seconds": 0.33295949999592267,
+        "speedup": 0.9650522061009027
+      },
+      {
+        "kind": "process",
+        "workers": 8,
+        "seconds": 0.3123835999867879,
+        "speedup": 1.028617699606858
+      }
+    ],
+    "tuning": [
+      {
+        "size": 1,
+        "seconds": 0.6811796999827493
+      },
+      {
+        "size": 64,
+        "seconds": 0.3593996999843512
+      },
+      {
+        "size": 256,
+        "seconds": 0.3437711999868043
+      },
+      {
+        "size": 1024,
+        "seconds": 0.3584155999997165
+      }
+    ],
+    "p": 0.0,
+    "fit_error": 0.16323879426347007,
+    "pickle_error": "AttributeError: Can't get local object 'main.<locals>.<lambda>'",
+    "async": [
+      {
+        "concurrent": false,
+        "seconds": 0.9614422000013292,
+        "aggregate": [
+          1340,
+          13,
+          7
+        ]
+      },
+      {
+        "concurrent": true,
+        "seconds": 0.19384120000177063,
+        "aggregate": [
+          1340,
+          13,
+          7
+        ]
+      }
+    ],
+    "frame_rows": 20000,
+    "frame_seq": 0.009413500025402755,
+    "frame_parallel": 0.6270604000019375,
+    "frame_result": [
+      {
+        "branch": "a",
+        "revenue": 5000000,
+        "orders": 10000
+      },
+      {
+        "branch": "b",
+        "revenue": 2000000,
+        "orders": 5000
+      }
+    ],
+    "images": [
+      {
+        "mode": "blur",
+        "workers": 1,
+        "seconds": 0.11215299999457784,
+        "checksum": 4125165
+      },
+      {
+        "mode": "blur",
+        "workers": 2,
+        "seconds": 0.27046560001326725,
+        "checksum": 4125165
+      },
+      {
+        "mode": "blur",
+        "workers": 4,
+        "seconds": 0.2544808000093326,
+        "checksum": 4125165
+      },
+      {
+        "mode": "blur",
+        "workers": 8,
+        "seconds": 0.26283049999619834,
+        "checksum": 4125165
+      },
+      {
+        "mode": "edges",
+        "workers": 1,
+        "seconds": 0.07300140001461841,
+        "checksum": 2008691
+      },
+      {
+        "mode": "edges",
+        "workers": 2,
+        "seconds": 0.22503709999728017,
+        "checksum": 2008691
+      },
+      {
+        "mode": "edges",
+        "workers": 4,
+        "seconds": 0.21448239998426288,
+        "checksum": 2008691
+      },
+      {
+        "mode": "edges",
+        "workers": 8,
+        "seconds": 0.25339709999389015,
+        "checksum": 2008691
+      }
+    ]
+  },
+  "lab14": {
+    "builtin_seconds": 0.0002627500070957467,
+    "toolz_seconds": 0.0003927999932784587,
+    "values": 3000,
+    "counterexamples": {
+      "median": [
+        0,
+        1
+      ],
+      "chunks": {
+        "xs": [
+          0
+        ],
+        "n": 1
+      },
+      "rle": "0"
+    }
+  },
+  "lab15": {
+    "before": [
+      {
+        "file": "legacy.py",
+        "sloc": 122,
+        "mi": 30.583385286086443,
+        "cc": [
+          [
+            "new_cart",
+            8,
+            1
+          ],
+          [
+            "check_open",
+            17,
+            2
+          ],
+          [
+            "add_item",
+            23,
+            7
+          ],
+          [
+            "remove_item",
+            48,
+            6
+          ],
+          [
+            "set_promo",
+            67,
+            2
+          ],
+          [
+            "subtotal",
+            76,
+            2
+          ],
+          [
+            "discount",
+            84,
+            4
+          ],
+          [
+            "delivery",
+            98,
+            3
+          ],
+          [
+            "quote",
+            108,
+            2
+          ],
+          [
+            "checkout",
+            127,
+            2
+          ],
+          [
+            "process",
+            135,
+            6
+          ],
+          [
+            "run_file",
+            153,
+            1
+          ]
+        ],
+        "functions": 12,
+        "heuristically_pure": 5,
+        "mutations": 23,
+        "findings": [
+          {
+            "function": "new_cart",
+            "line": 11,
+            "kind": "mutation"
+          },
+          {
+            "function": "new_cart",
+            "line": 12,
+            "kind": "mutation"
+          },
+          {
+            "function": "new_cart",
+            "line": 13,
+            "kind": "mutation"
+          },
+          {
+            "function": "add_item",
+            "line": 42,
+            "kind": "mutation"
+          },
+          {
+            "function": "add_item",
+            "line": 43,
+            "kind": "mutation"
+          },
+          {
+            "function": "add_item",
+            "line": 44,
+            "kind": "mutation"
+          },
+          {
+            "function": "add_item",
+            "line": 45,
+            "kind": "mutation"
+          },
+          {
+            "function": "add_item",
+            "line": 39,
+            "kind": "mutation"
+          },
+          {
+            "function": "remove_item",
+            "line": 60,
+            "kind": "mutation"
+          },
+          {
+            "function": "remove_item",
+            "line": 62,
+            "kind": "mutation"
+          },
+          {
+            "function": "set_promo",
+            "line": 73,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 111,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 118,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 119,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 120,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 121,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 122,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 123,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 114,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 115,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 116,
+            "kind": "mutation"
+          },
+          {
+            "function": "quote",
+            "line": 117,
+            "kind": "mutation"
+          },
+          {
+            "function": "checkout",
+            "line": 132,
+            "kind": "mutation"
+          },
+          {
+            "function": "run_file",
+            "line": 155,
+            "kind": "IO"
+          },
+          {
+            "function": "run_file",
+            "line": 159,
+            "kind": "IO"
+          },
+          {
+            "function": "run_file",
+            "line": 160,
+            "kind": "IO"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "file": "model.py",
+        "sloc": 18,
+        "mi": 100.0,
+        "cc": [
+          [
+            "Item",
+            5,
+            1
+          ],
+          [
+            "Cart",
+            14,
+            1
+          ],
+          [
+            "Event",
+            23,
+            1
+          ]
+        ],
+        "functions": 0,
+        "heuristically_pure": 0,
+        "mutations": 0,
+        "findings": []
+      },
+      {
+        "file": "core.py",
+        "sloc": 43,
+        "mi": 42.87068056355846,
+        "cc": [
+          [
+            "add_item",
+            6,
+            11
+          ],
+          [
+            "remove_item",
+            23,
+            9
+          ],
+          [
+            "reduce_event",
+            37,
+            8
+          ]
+        ],
+        "functions": 3,
+        "heuristically_pure": 3,
+        "mutations": 0,
+        "findings": []
+      },
+      {
+        "file": "discounts.py",
+        "sloc": 20,
+        "mi": 58.91994907597243,
+        "cc": [
+          [
+            "subtotal",
+            6,
+            2
+          ],
+          [
+            "volume_rule",
+            11,
+            2
+          ],
+          [
+            "promo_rule",
+            17,
+            3
+          ],
+          [
+            "discount",
+            29,
+            2
+          ]
+        ],
+        "functions": 4,
+        "heuristically_pure": 4,
+        "mutations": 0,
+        "findings": []
+      },
+      {
+        "file": "pricing.py",
+        "sloc": 16,
+        "mi": 65.53050922528692,
+        "cc": [
+          [
+            "quote",
+            8,
+            4
+          ]
+        ],
+        "functions": 1,
+        "heuristically_pure": 1,
+        "mutations": 0,
+        "findings": []
+      },
+      {
+        "file": "pipeline.py",
+        "sloc": 16,
+        "mi": 65.09083946930123,
+        "cc": [
+          [
+            "parse_event",
+            9,
+            5
+          ],
+          [
+            "process",
+            21,
+            1
+          ]
+        ],
+        "functions": 2,
+        "heuristically_pure": 2,
+        "mutations": 0,
+        "findings": []
+      },
+      {
+        "file": "shell.py",
+        "sloc": 17,
+        "mi": 68.28318364595535,
+        "cc": [
+          [
+            "run_file",
+            8,
+            1
+          ],
+          [
+            "main",
+            16,
+            1
+          ]
+        ],
+        "functions": 2,
+        "heuristically_pure": 1,
+        "mutations": 0,
+        "findings": [
+          {
+            "function": "run_file",
+            "line": 12,
+            "kind": "IO"
+          },
+          {
+            "function": "run_file",
+            "line": 13,
+            "kind": "IO"
+          },
+          {
+            "function": "run_file",
+            "line": 10,
+            "kind": "IO"
+          }
+        ]
+      }
+    ],
+    "performance": [
+      {
+        "size": 10,
+        "version": "imperative",
+        "seconds": 1.1800002539530396e-05,
+        "peak_bytes": 560
+      },
+      {
+        "size": 10,
+        "version": "functional",
+        "seconds": 5.7199998991563916e-05,
+        "peak_bytes": 2492
+      },
+      {
+        "size": 1000,
+        "version": "imperative",
+        "seconds": 0.0010047999967355281,
+        "peak_bytes": 5328
+      },
+      {
+        "size": 1000,
+        "version": "functional",
+        "seconds": 0.012691799987806007,
+        "peak_bytes": 9300
+      },
+      {
+        "size": 20000,
+        "version": "imperative",
+        "seconds": 0.01955280001857318,
+        "peak_bytes": 6928
+      },
+      {
+        "size": 20000,
+        "version": "functional",
+        "seconds": 0.27882449998287484,
+        "peak_bytes": 10900
+      }
+    ]
+  }
+}
