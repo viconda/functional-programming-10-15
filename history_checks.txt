@@ -1,3 +1,6 @@
 01 Characterize imperative shopping cart
 ......................                                                   [100%]
 
+02 Introduce immutable value objects
+......................                                                   [100%]
+
