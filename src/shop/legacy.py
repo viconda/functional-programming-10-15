@@ -1,4 +1,5 @@
 """Исходная императивная версия магазина, разработанная для исследования."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -37,7 +38,7 @@ def add_item(cart: dict[str, Any], event: dict[str, Any]) -> None:
                 raise ValueError("price mismatch")
             item["qty"] += quantity
             return
-    row = {}
+    row: dict[str, Any] = {}
     row["sku"] = sku
     row["price"] = price
     row["qty"] = quantity

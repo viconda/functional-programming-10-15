@@ -1,0 +1,19 @@
+.............................                                            [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.14-final-0 _______________
+
+Name                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------
+src\shop\__init__.py        1      0   100%
+src\shop\api.py             1      0   100%
+src\shop\core.py           41      0   100%
+src\shop\discounts.py      12      0   100%
+src\shop\legacy.py        121      1    99%   54
+src\shop\model.py          18      0   100%
+src\shop\pipeline.py       10      0   100%
+src\shop\pricing.py         8      0   100%
+src\shop\shell.py          15      0   100%
+-----------------------------------------------------
+TOTAL                     227      1    99%
+Coverage JSON written to file coverage.json
+29 passed in 1.23s

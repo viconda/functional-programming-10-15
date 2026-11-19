@@ -1,5 +1,7 @@
 from dataclasses import replace
+
 from .model import Cart, Event, Item
+
 
 def add_item(cart: Cart, event: Event) -> Cart:
     """Сохранить снимок и добавить товар в новую версию."""
@@ -13,7 +15,10 @@ def add_item(cart: Cart, event: Event) -> Cart:
     if existing is not None and existing.price != event.price:
         raise ValueError("price mismatch")
     item = Item(event.sku, event.price, event.qty + (existing.qty if existing else 0))
-    return replace(cart, items=tuple(sorted((*[x for x in cart.items if x.sku != event.sku],item))))
+    return replace(
+        cart, items=tuple(sorted((*[x for x in cart.items if x.sku != event.sku], item)))
+    )
+
 
 def remove_item(cart: Cart, event: Event) -> Cart:
     """Удалить количество с проверкой достаточности."""
@@ -25,7 +30,7 @@ def remove_item(cart: Cart, event: Event) -> Cart:
     if event.qty > old.qty:
         raise ValueError("insufficient quantity")
     kept = tuple(x for x in cart.items if x.sku != event.sku)
-    items = kept + ((replace(old,qty=old.qty-event.qty),) if event.qty < old.qty else ())
+    items = kept + ((replace(old, qty=old.qty - event.qty),) if event.qty < old.qty else ())
     return replace(cart, items=tuple(sorted(items)))
 
 
@@ -34,15 +39,15 @@ def reduce_event(cart: Cart, event: Event) -> Cart:
     if cart.closed:
         raise ValueError("cart closed")
     if event.op == "add":
-        return add_item(cart,event)
+        return add_item(cart, event)
     if event.op == "remove":
-        return remove_item(cart,event)
+        return remove_item(cart, event)
     if event.op == "promo":
         if event.code not in ("", "SAVE10", "FIX500"):
             raise ValueError("unknown promo")
-        return replace(cart,promo=event.code)
+        return replace(cart, promo=event.code)
     if event.op == "checkout":
         if not cart.items:
             raise ValueError("empty cart")
-        return replace(cart,closed=True)
+        return replace(cart, closed=True)
     raise ValueError("unknown operation")
