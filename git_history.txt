@@ -1,0 +1,9 @@
+fc95ee4 01 Characterize imperative shopping cart
+c2297e3 02 Introduce immutable value objects
+6aed3aa 03 Extract pure item transformations
+5319552 04 Compose discount rules as functions
+caae378 05 Add pure pricing and state reducer
+37b4b22 06 Switch public API to functional pipeline
+58041c6 07 Isolate command line and filesystem effects
+f255029 08 Add property tests and equivalence evidence
+a447481 Finalize tested lab 15 and reproducible results
