@@ -1,0 +1,11 @@
+pytest
+pytest-cov
+hypothesis
+ruff
+mypy
+pandas
+matplotlib
+toolz
+pyrsistent
+returns
+radon

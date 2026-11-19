@@ -1,0 +1,3 @@
+01 Characterize imperative shopping cart
+......................                                                   [100%]
+
