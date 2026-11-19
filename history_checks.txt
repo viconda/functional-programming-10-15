@@ -4,3 +4,6 @@
 02 Introduce immutable value objects
 ......................                                                   [100%]
 
+03 Extract pure item transformations
+......................                                                   [100%]
+
