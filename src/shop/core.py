@@ -27,3 +27,22 @@ def remove_item(cart: Cart, event: Event) -> Cart:
     kept = tuple(x for x in cart.items if x.sku != event.sku)
     items = kept + ((replace(old,qty=old.qty-event.qty),) if event.qty < old.qty else ())
     return replace(cart, items=tuple(sorted(items)))
+
+
+def reduce_event(cart: Cart, event: Event) -> Cart:
+    """Конечный автомат корзины без побочных эффектов."""
+    if cart.closed:
+        raise ValueError("cart closed")
+    if event.op == "add":
+        return add_item(cart,event)
+    if event.op == "remove":
+        return remove_item(cart,event)
+    if event.op == "promo":
+        if event.code not in ("", "SAVE10", "FIX500"):
+            raise ValueError("unknown promo")
+        return replace(cart,promo=event.code)
+    if event.op == "checkout":
+        if not cart.items:
+            raise ValueError("empty cart")
+        return replace(cart,closed=True)
+    raise ValueError("unknown operation")

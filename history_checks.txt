@@ -10,3 +10,6 @@
 04 Compose discount rules as functions
 ......................                                                   [100%]
 
+05 Add pure pricing and state reducer
+......................                                                   [100%]
+
