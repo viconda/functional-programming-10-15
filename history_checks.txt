@@ -7,3 +7,6 @@
 03 Extract pure item transformations
 ......................                                                   [100%]
 
+04 Compose discount rules as functions
+......................                                                   [100%]
+
